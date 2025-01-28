@@ -133,6 +133,7 @@ public class ManagerUI {
 
                 case 1:
                     System.out.println("***UNAPPROVED LOANS***");
+                    System.out.println("Enter customer username: ");
                     String username = sc.nextLine().trim();
                     while(!username.matches(Regex.USER_REGEX))
                     {

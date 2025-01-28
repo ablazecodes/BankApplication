@@ -22,6 +22,7 @@ import java.util.Scanner;
 import Constants.*;
 import Controllers.*;
 import Models.*;
+import Repositories.LoanRepository;
 
 
 public class CustomerUI {
@@ -642,7 +643,7 @@ public class CustomerUI {
         System.out.println("****LOAN APPLICATION****");
         System.out.println("Select the loan category (Personal/Mortgage/Business)");
         String cat = sc.nextLine().trim().toLowerCase().split(" ")[0];
-        while(!cat.equals("personal") && !cat.equals("mortgage") && !cat.equals("Business"))
+        while(!cat.equals("personal") && !cat.equals("mortgage") && !cat.equals("business"))
         {
             System.out.println("please enter appropriate category");
             cat = sc.nextLine().trim().toLowerCase().split(" ")[0];
@@ -660,12 +661,12 @@ public class CustomerUI {
                 sc.nextLine();
             }
         }
-
+        LoanRepository lsr = LoanRepository.getInstance();
         if(amount>50_00_000 && (CustomerController.applyLoan(customer, amount, cat)))
         {
             System.out.println("Loan applied");
         }
-        else if(amount<50_00_000) System.out.println("Loan Approved");
+        else if(amount<50_00_000 && CustomerController.applyLoan(customer, amount, cat)) System.out.println("Loan Approved");
         else System.out.println("Error applying for the loan");
     }
 

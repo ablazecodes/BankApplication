@@ -52,8 +52,7 @@ public class Loan {
      */
     @Override
     public String toString() {
-        return "Loan id=" + id +
-                ", amount=" + amount +
+        return "Loan amount= " + amount +
                 ", requiresApproval=" + requiresApproval +
                 ", isApproved=" + isApproved +
                 ", category='" + category + '\n' +

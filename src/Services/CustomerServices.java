@@ -119,10 +119,10 @@ public class CustomerServices {
      ********************************************************
      */
 
-    public static boolean applyForLoan(int amount, String cat, boolean requires, String username)
+    public static boolean applyForLoan(int amount, String cat, boolean requires, String username, int id)
     {
         LoanRepository lsr = LoanRepository.getInstance();
-        return lsr.insertLoan(amount, cat, requires, username);
+        return lsr.insertLoan(amount, cat, requires, username, id);
     }
 
 }

@@ -22,5 +22,5 @@ public class LoanConstants {
     public static final String COLUMN_APPLICATION_DATE = "application_date";
     public static final String COLUMN_IS_APPROVED = "isApproved";
     public static final String COLUMN_MANAGER_APPROVAL = "manager_approval";
-    public static final String COLUMN_APPLICATION_ID = "application_id";
+    public static final String COLUMN_LOAN_ID = "loan_id";
 }

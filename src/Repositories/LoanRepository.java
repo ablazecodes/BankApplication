@@ -20,6 +20,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static Constants.AccountConstants.*;
 import static Constants.AccountConstants.COLUMN_USERNAME;
@@ -68,7 +69,7 @@ public class LoanRepository {
      */
 
     public List<Loan> getUnapprovedLoans(String username) {
-        String query = "SELECT * FROM " + TABLE_LOAN_APPLICATIONS + " WHERE " +  COLUMN_USERNAME + " = ? AND " + COLUMN_IS_VERIFIED + " = ?" ;
+        String query = "SELECT * FROM " + TABLE_LOAN_APPLICATIONS + " WHERE " +  COLUMN_USERNAME + " = ? AND " + COLUMN_IS_APPROVED + " = ?" ;
         List<Loan> loans = new ArrayList<>();
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             stmt.setString(1, username);
@@ -84,7 +85,7 @@ public class LoanRepository {
                 loans.add(loan);
             }
         } catch (SQLException e) {
-            return null;
+            System.out.println(e.getMessage());
         }
         return loans;
     }
@@ -101,7 +102,7 @@ public class LoanRepository {
      */
 
     public synchronized boolean approveLoan(int loanId) {
-        String query = "UPDATE " +  TABLE_LOAN_APPLICATIONS + " SET " + COLUMN_IS_VERIFIED + " = ?  WHERE " + COLUMN_APPLICATION_ID + " = ?";
+        String query = "UPDATE " +  TABLE_LOAN_APPLICATIONS + " SET " + COLUMN_IS_VERIFIED + " = ?  WHERE " + COLUMN_LOAN_ID + " = ?";
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             stmt.setBoolean(1, true);
             stmt.setInt(2, loanId);
@@ -122,8 +123,8 @@ public class LoanRepository {
      ********************************************************
      */
 
-    public synchronized boolean insertLoan(int amount, String category, boolean requiresApproval, String username) {
-        String query = "INSERT INTO " +  TABLE_LOAN_APPLICATIONS +  " (" + COLUMN_USERNAME + ", " +  COLUMN_LOAN_AMOUNT + ", " + COLUMN_APPLICATION_DATE + ", " +  COLUMN_MANAGER_APPROVAL + ", " + COLUMN_TYPE + ", " + COLUMN_IS_APPROVED + ") VALUES (?, ?, ?, ?, ?, ?)";
+    public synchronized boolean insertLoan(int amount, String category, boolean requiresApproval, String username, int id) {
+        String query = "INSERT INTO " +  TABLE_LOAN_APPLICATIONS +  " (" + COLUMN_USERNAME + ", " +  COLUMN_LOAN_AMOUNT + ", " + COLUMN_APPLICATION_DATE + ", " +  COLUMN_MANAGER_APPROVAL + ", " + COLUMN_TYPE + ", " + COLUMN_IS_APPROVED +  ", " + COLUMN_LOAN_ID + ") VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = con.prepareStatement(query)) {
             stmt.setString(1, username);
@@ -132,10 +133,44 @@ public class LoanRepository {
             stmt.setBoolean(4, requiresApproval);
             stmt.setString(5, category);
             stmt.setBoolean(6, !requiresApproval);
+            stmt.setInt(7, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            return false;
+            System.out.println(e.getMessage());
         }
+        return false;
+    }
+
+    /*
+     *********************************************************
+     *  @Method Name    : getAllUnapprovedLoans
+     *  @author         : <Shreya Shukla>(shreya.shukla@antrazal.com)
+     *  @Company        : Antrazal
+     *  @description    : executes query to returns List of all unapproved loans
+     *  @param          : none
+     *  @return         : List<Loan>
+     ********************************************************
+     */
+
+    public List<Loan> getAllUnapprovedLoans() {
+        String query = "SELECT * FROM " + TABLE_LOAN_APPLICATIONS + " WHERE " + COLUMN_IS_APPROVED + " = ?" ;
+        List<Loan> loans = new ArrayList<>();
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            stmt.setBoolean(1, false);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("loan_id");
+                int amount = rs.getInt("loan_amount");
+                boolean requiresApproval = rs.getBoolean("manager_approval");
+                boolean isApproved = rs.getBoolean("isApproved");
+                String category = rs.getString("type");
+                Loan loan = new Loan(id, amount, requiresApproval, isApproved, category);
+                loans.add(loan);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return loans;
     }
 
 }
